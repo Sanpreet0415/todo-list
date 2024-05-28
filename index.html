@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        nav {
+            background-color: #333;
+            padding: 10px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        #addTodo {
+            margin: 20px auto;
+            width: 50%;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"], select {
+            padding: 10px;
+            width: 70%;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .priority-low {
+            background-color: #fff;
+        }
+
+        .priority-medium {
+            background-color: rgb(255,255,0);
+        }
+
+        .priority-high {
+            background-color: rgb(255,0,0);
+        }
+
+        .btn-danger {
+            background-color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+
+    </nav>
+    <h1>Create Todo</h1>
+    <div id="addTodo">
+        <input type="text" id="todoName" placeholder="Enter todo name">
+        <select id="priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+        <button onclick="addTodo()">Add Todo</button>
+    </div>
+    <h2>Todos</h2>
+    <table id="todoTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody id="todoList">
+            <!-- Todo items will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        // JavaScript code will be added here
+        document.addEventListener("DOMContentLoaded", function() {
+            showTodos();
+        });
+
+        function showTodos() {
+            const todoList = document.getElementById("todoList");
+            const todos = JSON.parse(localStorage.getItem("todos")) || [];
+
+            todoList.innerHTML = "";
+            todos.forEach(todo => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${todo.title}</td>
+                    <td>${todo.priority}</td>
+                    <td><button onclick="toggleStatus(${todo.id})">${todo.status === 'Pending' ? 'Pending🔃' : 'Completed✅'}</button></td>
+                    <td><button onclick="deleteTodo(${todo.id})">Delete</button></td>
+                `;
+                row.classList.add(`priority-${todo.priority}`);
+                todoList.appendChild(row);
+            });
+        }
+
+        function addTodo() {
+            const todoName = document.getElementById("todoName").value;
+            const priority = document.getElementById("priority").value;
+
+            if (!todoName.trim()) {
+                alert("Todo cannot be empty!");
+                return;
+            }
+
+            const todos = JSON.parse(localStorage.getItem("todos")) || [];
+            const newTodo = {
+                id: todos.length + 1,
+                title: todoName,
+                priority: priority,
+                status: 'Pending'
+            };
+            todos.push(newTodo);
+            localStorage.setItem("todos", JSON.stringify(todos));
+            showTodos();
+        }
+
+        function toggleStatus(id) {
+            const todos = JSON.parse(localStorage.getItem("todos")) || [];
+            const index = todos.findIndex(todo => todo.id === id);
+            if (index !== -1) {
+                todos[index].status = todos[index].status === 'Pending' ? 'Completed' : 'Pending';
+                localStorage.setItem("todos", JSON.stringify(todos));
+                showTodos();
+            }
+        }
+
+        function deleteTodo(id) {
+            const todos = JSON.parse(localStorage.getItem("todos")) || [];
+            const filteredTodos = todos.filter(todo => todo.id !== id);
+            localStorage.setItem("todos", JSON.stringify(filteredTodos));
+            showTodos();
+        }
+    </script>
+</body>
+</html>
